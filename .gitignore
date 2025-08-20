@@ -1,0 +1,9 @@
+# Ignore Jupyter Notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Ignore the models directory
+models/
+
+# Python cache files
+__pycache__/
