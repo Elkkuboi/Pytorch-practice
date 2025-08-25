@@ -8,7 +8,8 @@ import torchmetrics
 from sklearn.datasets import load_iris
 from torch import nn
 from sklearn.model_selection import train_test_split
-
+torch.manual_seed(42)
+torch.cuda.manual_seed(42)
 
 
 # Check PyTorch access (should print out a tensor)
