@@ -7,3 +7,5 @@ My goal is to learn the fundamentals of PyTorch and apply them through practical
 
 ## Projects
 * **Linear Regression:** The first script, `linear_regression.py`, implements a simple linear regression model from scratch.
+* **Binary Classification:** The script `classification.py` implements a small end-to-end classification example in PyTorch.  
+  It demonstrates creating a toy dataset, a lightweight feed-forward neural network, the complete training/validation loop, basic metrics (accuracy, loss).
