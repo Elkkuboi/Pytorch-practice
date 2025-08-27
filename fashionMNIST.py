@@ -10,12 +10,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 import torchinfo, torchmetrics
 from torch import nn
+from tqdm.auto import tqdm
+from helperfunctions import accuracy_fn
+
 
 # Torchvision
 import torchvision
 from torchvision import datasets
 from torchvision import transforms
 from torchvision.transforms import ToTensor
+
+
 
 
 
@@ -158,3 +163,98 @@ print(f"Check out the first model: {model_0}")
 # Test that it works correctly
 dummy_x = torch.rand([1, 1, 28, 28])
 print(f"The first test with the model, should output 10 values {model_0(dummy_x)}")
+
+# Time to setup the optimizer and loss function
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(params = model_0.parameters(),
+                             lr = 0.01)
+
+# Create a function for timing our calculations:
+from timeit import default_timer as timer
+def print_train_time(start: float,
+                     end: float,
+                     device: torch.device = None):
+
+    """ Prints difference between start and end time"""
+    total_time = end - start
+    print(f"Train time on {device}: {total_time:.3f} seconds")
+    return total_time
+
+
+# Training and testing loop
+train_time_start_on_cpu = timer()
+epochs = 10
+
+for epoch in tqdm(range(epochs)):
+    print(f"Epoch: {epoch} \n-----")
+
+    ### Training
+    train_loss = 0
+    # Add a loop to batches
+    for batch, (X, y) in enumerate(train_dataloader):
+        model_0.train()
+        y_preds = model_0(X)
+        loss = loss_fn(y_preds, y)
+        train_loss += loss
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if batch % 10 == 0:
+            print(f" Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples.")
+
+    # Training loss
+    train_loss /= len(train_dataloader)
+    
+    
+    ### Testing loop
+    test_loss, test_acc = 0, 0
+    model_0.eval()
+    with torch.inference_mode():
+        for X, y in test_dataloader:
+            test_pred = model_0(X)
+            test_loss += loss_fn(test_pred, y)
+            test_acc += accuracy_fn(y_true=y, y_pred=test_pred.argmax(dim=1))
+        test_loss /= len(test_dataloader)
+        test_acc /= len(test_dataloader)
+    print(f"Train loss {train_loss:.4f} Test loss: {test_loss:.4f} Test acc: {test_acc:.4f}")    
+
+train_time_end_on_cpu = timer()
+total_train_time_model_0 = print_train_time(start=train_time_start_on_cpu,
+                                            end= train_time_end_on_cpu,
+                                            device=str(next(model_0.parameters()).device))
+
+
+# Create a function for evaluating models
+def eval_model(model: torch.nn.Module,
+               data_loader: torch.utils.data.DataLoader,
+               loss_fn: torch.nn.Module,
+               accuracy_fn):
+
+    """Returns a dictionary containing the results of model predicting on data_loader"""
+    loss, acc = 0, 0
+    model.eval()
+    with torch.inference_mode():
+        for X, y in tqdm(data_loader):
+            y_pred = model(X)
+            loss += loss_fn(y_pred, y)
+            acc += accuracy_fn(y_true=y,
+                               y_pred=y_pred.argmax(dim = 1))
+        
+        # Scale loss and acc to find average loss/acc per batch
+        loss /= len(data_loader)
+        acc /= len(data_loader)
+    
+    return {"model_name": model.__class__.__name__,
+            "model_loss": loss.item(),
+            "model_acc": acc}
+
+
+# Calculate model 0 results on test dataset
+model_0_results = eval_model(model = model_0,
+                            data_loader = test_dataloader,
+                            loss_fn = loss_fn,
+                            accuracy_fn=accuracy_fn)
+
+print(f"The results of first model {model_0_results}")
+print("We have some room for improvement")
