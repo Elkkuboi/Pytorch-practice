@@ -9,4 +9,7 @@ My goal is to learn the fundamentals of PyTorch and apply them through practical
 * **Linear Regression:** The first script, `linear_regression.py`, implements a simple linear regression model from scratch.
 * **Binary Classification:** The script `classification.py` implements a small end-to-end classification example in PyTorch.  
   It demonstrates creating a toy dataset, a lightweight feed-forward neural network, the complete training/validation loop, basic metrics (accuracy, loss).
-* **Multiclassification with IRIS dataset** This script `iris.py` is a classic, the "hello world" of multiclassification ml. It's a compact, end-to-end example using the Iris dataset and a feed-forward network implemented with torch.nn.Sequential.
+* **Multiclassification with IRIS dataset:** This script `iris.py` is a classic, the "hello world" of multiclassification ml. It's a compact, end-to-end example using the Iris dataset and a feed-forward network implemented with torch.nn.Sequential.
+* **Fashion-MNIST Exploration:**  The script `fashionMNIST.py` introduces working with image datasets in PyTorch using the more difficult fashion-MNIST dataset.
+Right now it is a work in progress, but you can expect the first model to be ready soon.
+
